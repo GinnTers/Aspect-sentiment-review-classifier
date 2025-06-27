@@ -66,6 +66,10 @@ Each review may be linked to multiple aspects, each with a corresponding sentime
   - Stopword removal using a curated `.txt` list
 - Output: cleaned review sequences in `data/data_preprocess.xlsx`
 
+Example wordcloud:
+
+![wordcloud](assets/wordcloud.png)
+
 ### 4. Embedding & Tokenization  
 - Trains a custom Word2Vec model
 - Tokenizes input sequences using Keras Tokenizer
@@ -92,8 +96,11 @@ Each review may be linked to multiple aspects, each with a corresponding sentime
   - ROC Curve
 
 Example for aspect_quality:
-![Confusion Matrix](assets/confusion_matrix.png)  
-![ROC Curve](assets/evaluation_roc.png)
+
+![Eva](assets/eva.jpg)
+![Confusion Matrix](assets/cf.jpg)  
+![Classify](assets/classify.jpg)
+![ROC Curve](assets/ROC.jpg)
 
 Summary all:
 
@@ -104,6 +111,13 @@ Summary all:
 | Packaging  | Random Forest    | 89.72%   |
 | Others     | Random Forest    | 88.23%   |
 | Price      | Neural Network   | 85.4%    |
+
+---
+
+## Result
+Result from running `main.ipynb` with a Vietnamese review input
+
+![Result](assets/Result.jpg)
 
 ---
 
@@ -124,11 +138,6 @@ Summary all:
 
 2. Update paths in `main.ipynb`  
 3. Input a Vietnamese review → returns aspect-level sentiment
-
----
-
-## Result
-
 
 ---
 
