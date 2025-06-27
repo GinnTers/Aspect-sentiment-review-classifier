@@ -1,102 +1,134 @@
 # Aspect-Based Sentiment Classification for E-Commerce Reviews  
-> *Project conducted: 2024 (was not uploaded at the time)*
+> Project conducted: December 2024 (was not uploaded at the time)
 
-Building a machine learning pipeline to classify customer sentiments across various product aspects in the e-commerce domain.
+Building a machine learning pipeline to classify customer sentiments across multiple product aspects in the e-commerce domain.
 
 ---
 
 ## Introduction
 
-This project was developed with the aim of enhancing customer experience understanding in e-commerce platforms by leveraging NLP and machine learning. The model was trained on review data crawled from **Hasaki.vn**, a popular Vietnamese online beauty store.
+This project aims to extract structured insights from unstructured customer reviews collected from Hasaki.vn. By leveraging NLP and machine learning, it automatically identifies six key product aspects:
+- Store
+- Service
+- Packaging
+- Price
+- Quality
+- Others
 
-Each customer comment is analyzed and classified based on six key aspects:  
-**Store**, **Service**, **Packaging**, **Price**, **Quality**, and **Others**.  
-This aspect-based sentiment analysis allows businesses to pinpoint specific areas of excellence and improvement.
+Each review is classified by both aspect and sentiment polarity (Positive/Negative/Neutral), supporting customer experience analysis at a granular level.
 
 ---
 
 ## Dataset
 
-### Data Source
-Customer reviews were scraped using the **Selenium** library from Hasaki.vn. The dataset contains:
-- Product IDs and metadata
-- Review content in Vietnamese
-- Timestamps and other metadata
+### Data Source  
+Data was crawled using Selenium from product pages and review sections on Hasaki.vn.
 
-### Labeling Process
-Aspects and sentiments were annotated using a combination of:
-- **Gemini API**
-- **Manual labeling**
+### Labeling Process  
+A hybrid labeling approach was used:
+- Gemini API: for automated tagging of aspects and sentiments.
+- Manual verification: to improve reliability.
 
-Labeled data was structured and exported for training via `data_label.xlsx`.
+Each review may be linked to multiple aspects, each with a corresponding sentiment label.
 
 ---
 
 ## Tools & Technologies
 
-- **Languages**: Python  
-- **Libraries**: Pandas, NumPy, scikit-learn, Gensim (Word2Vec), TensorFlow/Keras  
-- **Crawling**: Selenium  
-- **Model Management**: joblib, pickle  
+- Languages: Python  
+- Libraries: pandas, numpy, scikit-learn, gensim, tensorflow, keras  
+- Embedding: Word2Vec  
+- Model persistence: joblib, pickle  
+- Development: Google Colab (please update file paths if running locally)
 
 ---
 
 ## Project Workflow
 
-1. **Data Collection**  
-   - File: `crawl_comment.ipynb`  
-   - Crawls review data using Selenium and saves to `data_crawl.xlsx`
+### 1. Data Crawling  
+- File: `crawl_comment.ipynb`  
+- Crawls product IDs and corresponding customer reviews  
+- Saves raw review data to `data/data_crawl.xlsx`
 
-2. **Labeling**  
-   - File: `code_label_gemini_api.ipynb`  
-   - Uses Gemini API and manual refinement to generate `data_label.xlsx`
+### 2. Labeling  
+- File: `code_label_gemini_api.ipynb`  
+- Uses Gemini API to assign:
+  - Aspect tags: e.g., Service, Packaging...
+  - Sentiment: Positive, Negative, Neutral  
+- Outputs structured file `data/data_label.xlsx` with one-hot encoded aspect columns
 
-3. **Preprocessing**  
-   - File: `data_preprocessing.ipynb`  
-   - Includes cleaning text, removing stopwords, replacing emojis, and lowercasing
+### 3. Data Preprocessing  
+- File: `data_preprocessing.ipynb`  
+- Includes:
+  - Lowercasing, punctuation/special character removal
+  - Emoji replacement
+  - Tokenization using Vietnamese rules
+  - Stopword removal using a curated `.txt` list
+- Output: cleaned review sequences in `data/data_preprocess.xlsx`
 
-4. **Feature Extraction (Word Embedding)**  
-   - Trains Word2Vec model from scratch  
-   - Saved in `embedding_model_file/word2vec_sentiment.model`  
-   - Tokenizer saved as `tokenizer.pkl`
+### 4. Embedding & Tokenization  
+- Trains a custom Word2Vec model
+- Tokenizes input sequences using Keras Tokenizer
+- Produces:
+  - `word2vec_sentiment.model` (embedding)
+  - `tokenizer.pkl` (used for training neural networks)
 
-5. **Model Training**  
-   - Separate models trained per aspect (see folder `model_code/`)
-   - Algorithms used: Logistic Regression, SVM, Random Forest, Neural Network  
-   - Final models saved in `model_file/` as `.joblib` files
+### 5. Model Training  
+- Folder `model_code/` contains 6 training notebooks (1 per aspect)
+- Models trained:
+  - Logistic Regression
+  - SVM
+  - Random Forest
+  - Neural Network  
+- Best-performing model selected per aspect  
+- Trained `.joblib` models stored in `model_file/`
 
-6. **Evaluation**  
-   - 5-Fold cross-validation performed for each aspect  
-   - Accuracy results:
-     - `Service`: Neural Network (92.3%)  
-     - `Price`: Neural Network (85.4%)  
-     - `Store`: Random Forest (90.1%)  
-     - `Packaging`: Random Forest (89.72%)  
-     - `Others`: Random Forest (88.23%)
+### 6. Evaluation  
+- Performed with:
+  - Accuracy
+  - Precision / Recall / F1-score
+  - Confusion Matrix
+  - Classification Report
+  - ROC Curve
+
+Example for aspect_quality:
+![Confusion Matrix](assets/confusion_matrix.png)  
+![ROC Curve](assets/evaluation_roc.png)
+
+Summary all:
+
+| Aspect     | Model            | Accuracy |
+|------------|------------------|----------|
+| Service    | Neural Network   | 92.3%    |
+| Store      | Random Forest    | 90.1%    |
+| Packaging  | Random Forest    | 89.72%   |
+| Others     | Random Forest    | 88.23%   |
+| Price      | Neural Network   | 85.4%    |
 
 ---
 
 ## How to Use
 
-### Option 1: Run Full Pipeline
-To reproduce results from scratch:
-1. Run files in this order:
+### Option 1: Full Pipeline  
+1. Run the following in order (on Colab):
    - `crawl_comment.ipynb`
    - `code_label_gemini_api.ipynb`
    - `data_preprocessing.ipynb`
-   - One or more files in `model_code/`
+   - Any training notebook in `model_code/`
    - `main.ipynb`
 
-### Option 2: Use Pre-trained Models
-To run directly using trained models:
-1. Download all files from:
-   - `embedding_model_file/`
-   - `model_file/`
+### Option 2: Pre-trained Models  
+1. Download:
+   - `embedding_model_file/`  
+   - `model_file/`  
 
-2. In `main.ipynb`, update the path to match your local directory for loading models.
+2. Update paths in `main.ipynb`  
+3. Input a Vietnamese review → returns aspect-level sentiment
 
-3. Run `main.ipynb` and input a new review.  
-   The model will return predicted **aspect(s)** and **sentiment**.
+---
+
+## Result
+
 
 ---
 
@@ -106,8 +138,3 @@ To run directly using trained models:
 - Trained and compared multiple classification models  
 - Built a functional inference pipeline ready for deployment  
 - Practiced crawling, labeling, NLP preprocessing, model evaluation, and modular code organization
-
----
-
-## File Structure
-
